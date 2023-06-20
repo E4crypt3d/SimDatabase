@@ -24,13 +24,15 @@ To use the SIM and CNIC utility script, follow these steps:
 
 1. Clone the repository:
 
+```
 git clone https://github.com/E4crypt3d/SimDatabase.git
-
+```
 
 2. Navigate to the project directory:
 
+```
 cd SimDatabase
-
+```
 
 3. Install the required dependencies:
 
@@ -39,11 +41,13 @@ pip install -r requirements.txt
 ```
 
 4. Run the script by providing the appropriate command-line arguments:
+
 ```
 python program.py -n <phone_number>
 ```
 
 or
+
 ```
 python program.py -c <cnic_id>
 ```
@@ -57,11 +61,13 @@ Replace `<phone_number>` with the phone number you want to validate or retrieve 
 Here are a few examples of how to use the script:
 
 - Retrieve SIM card data:
+
 ```
 python program.py -n 1234567890
 ```
 
 - Retrieve CNIC details:
+
 ```
 python program.py -c 1234567890123
 ```
@@ -74,13 +80,6 @@ The authors and contributors of this project cannot be held responsible for any 
 
 Always exercise caution and follow best practices when working with sensitive information or deploying code in a production environment.
 
-
-
 ## Contact
 
 If you have any questions or suggestions, please feel free to reach out to the creator, E4CRYPT3D, via email at [gohramgkb@gmail.com](mailto:gohramgkb@gmail.com).
-
----
-
-Thank you for using the SIM and CNIC Utility! We hope it helps simplify your SIM card and CNIC data management tasks.
-Please note that this Markdown code can be copied and saved as a README.md file in your repository.
