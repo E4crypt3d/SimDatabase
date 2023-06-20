@@ -14,13 +14,17 @@ def validate_cnic(cnic):
         return True
     else:
         print(
-            cs("Invalid CNIC Number - Provide a Valid CNIC Number", 'red'))
+            cs("Invalid CNIC Number - Provide a Valid CNIC Number\n", 'red'))
         exit()
 
 
 def get_cnic_details(cnic):
     db = get_db()
-    response = requests.post(db, data={"cnnum": cnic}, headers=headers)
+    try:
+        response = requests.post(db, data={"cnnum": cnic}, headers=headers)
+    except Exception:
+        print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
+        exit()
     soup = BeautifulSoup(response.content, "html.parser")
     tables = soup.find_all('table')
     cnic_data_list = []

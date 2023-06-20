@@ -16,14 +16,18 @@ def is_number_valid(number):
         return bool(lc_match)
     else:
         print(
-            cs("Invalid Number - Number must be in '923[0-9]' or '03[0-9]' format.", 'red'))
+            cs("Invalid Number - Number must be in '923[0-9]' or '03[0-9]' format.\n", 'red'))
         exit()
 
 
 def get_sim_datebase(number):
     db = get_db()
-    response = requests.post(
-        db, data={'cnnum': number}, headers=headers)
+    try:
+        response = requests.post(
+            db, data={'cnnum': number}, headers=headers)
+    except Exception:
+        print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
+        exit()
     soup = BeautifulSoup(response.content, "html.parser")
     souped_content = soup.find(class_='tg')
     if souped_content:
@@ -44,5 +48,5 @@ def get_sim_datebase(number):
 
         return sim_data
     else:
-        print(cs(f"No Records Found for {number}", 'red'))
+        print(cs(f"No Records Found for {number}\n", 'red'))
         exit()
