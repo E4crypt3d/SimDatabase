@@ -2,6 +2,7 @@ import re
 from stringcolor import cs
 import requests
 from bs4 import BeautifulSoup
+from urllib3.exceptions import NameResolutionError
 from utils import headers, get_db
 
 
@@ -25,9 +26,10 @@ def get_sim_datebase(number):
     try:
         response = requests.post(
             db, data={'cnnum': number}, headers=headers)
-    except Exception:
+    except NameResolutionError:
         print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
         exit()
+
     soup = BeautifulSoup(response.content, "html.parser")
     souped_content = soup.find(class_='tg')
     if souped_content:
