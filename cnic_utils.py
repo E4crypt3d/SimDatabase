@@ -46,6 +46,7 @@ def get_cnic_details(cnic):
 
             cnic_data_list.append(data_dict)
         return cnic_data_list
+
     else:
         print(cs(f"No Records Found on {cnic}\n", 'red'))
         exit()
