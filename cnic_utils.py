@@ -26,6 +26,9 @@ def get_cnic_details(cnic):
     except NameResolutionError:
         print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
         exit()
+    except requests.exceptions.ConnectionError:
+        print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
+        exit()
     soup = BeautifulSoup(response.content, "html.parser")
     tables = soup.find_all('table')
     if tables:
