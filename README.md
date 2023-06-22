@@ -72,6 +72,8 @@ python program.py -n 1234567890
 python program.py -c 1234567890123
 ```
 
+- ### *IMPORTANT NOTE:* If the SIM and CNIC Utility doesn't work, please change your DNS to 1.1.1.1 (Cloudflare DNS).
+
 ## Education Disclaimer
 
 This project is intended for educational purposes only. The code and information provided here are meant to demonstrate programming concepts and should not be used in production environments or for any other purpose beyond learning.
