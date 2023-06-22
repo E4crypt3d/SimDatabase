@@ -2,7 +2,7 @@ import re
 from stringcolor import cs
 import requests
 from bs4 import BeautifulSoup
-from utils import headers, get_db
+from utils import get_headers, get_db
 
 
 def validate_cnic(cnic):
@@ -20,6 +20,7 @@ def validate_cnic(cnic):
 
 def get_cnic_details(cnic):
     db = get_db()
+    headers = get_headers()
     try:
         response = requests.post(db, data={"cnnum": cnic}, headers=headers)
     except Exception:

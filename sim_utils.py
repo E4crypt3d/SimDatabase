@@ -1,4 +1,4 @@
-from utils import headers, get_db
+from utils import get_headers, get_db
 import re
 from stringcolor import cs
 import requests
@@ -22,6 +22,7 @@ def is_number_valid(number):
 
 def get_sim_datebase(number):
     db = get_db()
+    headers = get_headers()
     try:
         response = requests.post(
             db, data={'cnnum': number}, headers=headers)
