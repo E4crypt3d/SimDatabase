@@ -2,8 +2,7 @@ import re
 from stringcolor import cs
 import requests
 from bs4 import BeautifulSoup
-from urllib3.exceptions import NameResolutionError
-from utils import headers, get_db
+from utils import get_headers, get_db
 
 
 def validate_cnic(cnic):
@@ -21,14 +20,17 @@ def validate_cnic(cnic):
 
 def get_cnic_details(cnic):
     db = get_db()
+    headers = get_headers()
     try:
         response = requests.post(db, data={"cnnum": cnic}, headers=headers)
-    except NameResolutionError:
-        print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
+    except Exception:
+        print(cs("Try:", "yellow").bold())
+
+        print(cs("""\t * Please Make sure you are connected to the Internet
+        \n\t * Try Again or rerun
+        \n\t * Try Changing your DNS to 1.1.1.1, 1.0.0.1\n""", 'red'))
         exit()
-    except requests.exceptions.ConnectionError:
-        print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
-        exit()
+
     soup = BeautifulSoup(response.content, "html.parser")
     tables = soup.find_all('table')
     if tables:
