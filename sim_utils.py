@@ -1,12 +1,8 @@
-from utils import headers, get_db
+from utils import get_headers, get_db
 import re
 from stringcolor import cs
 import requests
 from bs4 import BeautifulSoup
-from urllib3.exceptions import NameResolutionError
-
-
-# Define the new DNS server
 
 
 def is_number_valid(number):
@@ -26,14 +22,16 @@ def is_number_valid(number):
 
 def get_sim_datebase(number):
     db = get_db()
+    headers = get_headers()
     try:
         response = requests.post(
             db, data={'cnnum': number}, headers=headers)
-    except NameResolutionError:
-        print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
-        exit()
-    except requests.exceptions.ConnectionError:
-        print(cs("\nPlease Make sure you are connected to the Internet or Try again Later.\n", "red"))
+    except Exception:
+        print(cs("Try:", "yellow").bold())
+
+        print(cs("""\t * Please Make sure you are connected to the Internet
+        \n\t * Try Again or rerun
+        \n\t * Try Changing your DNS to 1.1.1.1, 1.0.0.1\n""", 'red'))
         exit()
 
     soup = BeautifulSoup(response.content, "html.parser")
