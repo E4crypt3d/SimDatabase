@@ -71,5 +71,3 @@ def update_repo():
     else:
         print("Client is up to date, no update required.")
 
-
-update_repo()
