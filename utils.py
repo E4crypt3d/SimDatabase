@@ -54,13 +54,13 @@ def update_repo():
 
     # Get the latest tag
     latest_tag = repo.tags[-1].name
-
+    current_tag = ''
     # Get the current checked-out tag
     for tag_ref in repo.tags:
         if tag_ref.commit == repo.head.commit:
             current_tag = tag_ref.name
             break
-
+    print(current_tag)
     if latest_tag != current_tag:
         repo.git.checkout(latest_tag)
 
@@ -70,3 +70,6 @@ def update_repo():
         print("Repository updated successfully!")
     else:
         print("Client is up to date, no update required.")
+
+
+update_repo()
