@@ -32,7 +32,6 @@ def get_headers():
         'Accept-Language': 'en-US,en;q=0.9',
         'Referer': ref_de,
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        #  'Accept-Encoding':'gzip, deflate, br',
         'Origin': ori_de,
         'Cache-Control': 'max-age=0',
         'Content-Length': '16'}
