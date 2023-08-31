@@ -43,13 +43,13 @@ pip install -r requirements.txt
 4. Run the script by providing the appropriate command-line arguments:
 
 ```
-python program.py -n <phone_number>
+python main.py -n <phone_number>
 ```
 
 or
 
 ```
-python program.py -c <cnic_id>
+python main.py -c <cnic_id>
 ```
 
 Replace `<phone_number>` with the phone number you want to validate or retrieve SIM card data for, and `<cnic_id>` with the CNIC number you want to validate or retrieve details for.
@@ -63,13 +63,13 @@ Here are a few examples of how to use the script:
 - Retrieve SIM card data:
 
 ```
-python program.py -n 1234567890
+python main.py -n 1234567890
 ```
 
 - Retrieve CNIC details:
 
 ```
-python program.py -c 1234567890123
+python main.py -c 1234567890123
 ```
 
 - ### *IMPORTANT NOTE:* If the SIM and CNIC Utility doesn't work, please change your DNS to 1.1.1.1 (Cloudflare DNS).
