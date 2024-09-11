@@ -43,7 +43,7 @@ Replace `<phone_number>` with the actual phone number you want to verify.
 To verify a CNIC, use:
 
 ```bash
-python main.py -c <cnic_id>
+python VerifyPK.py -c <cnic_id>
 ```
 
 Replace `<cnic_id>` with the actual CNIC you want to verify.
@@ -53,11 +53,11 @@ Replace `<cnic_id>` with the actual CNIC you want to verify.
 **Phone No**
 
 ```bash
-python main.py -c 9201234567893
+python VerifyPK.py -c 9201234567893
 ```
 
 **Phone No**
 
 ```bash
-python main.py -n 03123456789
+python VerifyPK.py -n 03123456789
 ```
