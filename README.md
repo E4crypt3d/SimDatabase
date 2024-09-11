@@ -61,3 +61,7 @@ _Phone No_
 ```bash
 python VerifyPK.py -n 03123456789
 ```
+
+### Troubleshooting:
+
+If you experience connection issues or the executable isn't working as expected, try adjusting your DNS settings. We recommend using `1.1.1.1` for improved connectivity.
