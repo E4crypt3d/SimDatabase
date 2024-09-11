@@ -1,87 +1,63 @@
-# SIM and CNIC Utility
+# VerifyPK
 
-This Python script provides utility functions for working with SIM card and CNIC (Computerized National Identity Card) data. It allows you to validate phone numbers and CNIC numbers, as well as retrieve information related to SIM cards and CNIC details.
+**VerifyPK** is a Python script that allows you to verify phone numbers and CNICs (Computerized National Identity Cards) from Pakistan. It provides a command-line interface to check if the provided phone number or CNIC is valid and retrieves associated data from a web service.
 
 ## Features
 
-- Phone Number Validation: Check if a phone number is valid.
-- SIM Database Lookup: Retrieve data associated with a phone number.
-- CNIC Validation: Validate the format of a CNIC number.
-- CNIC Details Retrieval: Get information related to a CNIC number.
+- **Phone Number Verification**: Check if a phone number is valid and retrieve information related to it.
+- **CNIC Verification**: Validate a CNIC and retrieve related details from a web service.
+- **Retry Mechanism**: Automatically retries connections up to three times in case of network issues.
 
-## Dependencies
+## Installation
 
-The script relies on the following dependencies:
-
-- `sim_utils` module: Provides functions for phone number validation and SIM database lookup.
-- `cnic_utils` module: Contains functions for CNIC validation and CNIC details retrieval.
-- `stringcolor` module: Allows for color formatting of console output.
-- `sys` module: Provides access to command-line arguments.
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/E4crypt3d/SimDatabase
+   ```
+2. **Navigate to the Project Directory**:
+   ```bash
+   cd SimDatabase
+   ```
+3. **Install Dependencies**:
+   Ensure you have Python installed, then install the required packages using pip:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Usage
 
-To use the SIM and CNIC utility script, follow these steps:
+You can run the script from the command line to verify either a phone number or a CNIC.
 
-1. Clone the repository:
+### Verify Phone Number
 
-```
-git clone https://github.com/E4crypt3d/SimDatabase.git
-```
+To verify a phone number, use:
 
-2. Navigate to the project directory:
-
-```
-cd SimDatabase
+```bash
+python VerifyPK.py -n <phone_number>
 ```
 
-3. Install the required dependencies:
+Replace `<phone_number>` with the actual phone number you want to verify.
 
-```
-pip install -r requirements.txt
-```
+### Verify CNIC
 
-4. Run the script by providing the appropriate command-line arguments:
+To verify a CNIC, use:
 
-```
-python main.py -n <phone_number>
-```
-
-or
-
-```
+```bash
 python main.py -c <cnic_id>
 ```
 
-Replace `<phone_number>` with the phone number you want to validate or retrieve SIM card data for, and `<cnic_id>` with the CNIC number you want to validate or retrieve details for.
+Replace `<cnic_id>` with the actual CNIC you want to verify.
 
-**Note:** Ensure you have the necessary permissions and access rights to retrieve SIM and CNIC data.
+### Example
 
-## Example Usage
+**Phone No**
 
-Here are a few examples of how to use the script:
-
-- Retrieve SIM card data:
-
-```
-python main.py -n 1234567890
+```bash
+python main.py -c 9201234567893
 ```
 
-- Retrieve CNIC details:
+**Phone No**
 
+```bash
+python main.py -n 03123456789
 ```
-python main.py -c 1234567890123
-```
-
-- ### *IMPORTANT NOTE:* If the SIM and CNIC Utility doesn't work, please change your DNS to 1.1.1.1 (Cloudflare DNS).
-
-## Education Disclaimer
-
-This project is intended for educational purposes only. The code and information provided here are meant to demonstrate programming concepts and should not be used in production environments or for any other purpose beyond learning.
-
-The authors and contributors of this project cannot be held responsible for any misuse or damage caused by the use of this code. Use it at your own risk and discretion.
-
-Always exercise caution and follow best practices when working with sensitive information or deploying code in a production environment.
-
-## Contact
-
-If you have any questions or suggestions, please feel free to reach out to the creator, E4CRYPT3D, via email at [gohramgkb@gmail.com](mailto:gohramgkb@gmail.com).

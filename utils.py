@@ -1,7 +1,6 @@
 import random
 import os
 import base64
-import git
 
 
 def get_db():
@@ -39,35 +38,3 @@ def get_headers():
         'Content-Length': '16'}
 
     return headers
-
-
-def update_repo():
-    # Replace with the actual path to your repository
-    print()
-    repo_path = os.getcwd()
-    print(repo_path)
-    # Create a Git Repo object
-    repo = git.Repo(repo_path)
-
-    # Fetch the latest changes from the remote repository
-    repo.remotes.origin.fetch()
-
-    # Get the latest tag
-    latest_tag = repo.tags[-1].name
-    current_tag = ''
-    # Get the current checked-out tag
-    for tag_ref in repo.tags:
-        if tag_ref.commit == repo.head.commit:
-            current_tag = tag_ref.name
-            break
-    print(current_tag)
-    if latest_tag != current_tag:
-        repo.git.checkout(latest_tag)
-
-        print('Updating repo')
-        repo.git.pull()
-
-        print("Repository updated successfully!")
-    else:
-        print("Client is up to date, no update required.")
-
