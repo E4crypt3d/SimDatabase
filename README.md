@@ -50,13 +50,13 @@ Replace `<cnic_id>` with the actual CNIC you want to verify.
 
 ### Example
 
-**Phone No**
+_CNIC Example_
 
 ```bash
 python VerifyPK.py -c 9201234567893
 ```
 
-**Phone No**
+_Phone No_
 
 ```bash
 python VerifyPK.py -n 03123456789
