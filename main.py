@@ -1,40 +1,73 @@
+import sys
+import argparse
+from stringcolor import cs
+from columnar import columnar
 from sim_utils import is_number_valid, get_sim_datebase
 from cnic_utils import validate_cnic, get_cnic_details
-from stringcolor import cs
-import sys
 
+def print_banner():
+    banner = """
+    *****************************************
+    *          SIM DATABASE TOOL            *
+    *         Created By E4CRYPT3D          *
+    *****************************************
+    """
+    print(cs(banner, "yellow").bold())
 
-if '__main__' == __name__:
-    print(cs("\nCreated By E4CRYPT3D\n", "yellow").bold())
-    if len(sys.argv) != 3:
-        print(
-            "Invalid arguments. Usage: python program.py -n <phone_number> or -c <cnic_id>")
+def display_table(data, title):
+    if not data:
+        print(cs(f"\n[!] No records found for {title}.", "red"))
+        return
+
+    print(cs(f"\n[+] Results for {title}:", "cyan").bold())
+    
+    if isinstance(data, dict):
+        headers = ['Field', 'Value']
+        rows = [[k, v] for k, v in data.items()]
+    elif isinstance(data, list):
+        headers = list(data[0].keys())
+        rows = [[item.get(h, '') for h in headers] for item in data]
     else:
-        option = sys.argv[1]
-        value = sys.argv[2]
+        print(cs("[!] Error: Unexpected data format.", "red"))
+        return
 
-        if option == "-n":
-            if is_number_valid(value):
-                print(cs("Valid phone number", "green"))
-                data = get_sim_datebase(value)
-                print(cs(f"\nData Found on {value}", 'yellow'))
-                print(cs("\n Key        | Value      |", 'yellow'))
-                print("+---------------+------------+")
-                for k, d in data.items():
-                    print(f" {k:<10} | {d:<10} |")
-                print("+---------------+------------+------------+\n")
+    table = columnar(rows, headers, no_borders=False)
+    print(table)
 
-        elif option == "-c":
-            if validate_cnic(value):
-                print(cs("Valid CNIC number", "green"))
-                data = get_cnic_details(value)
-                print(
-                    cs(f"\nTotal {len(data)} Data Found on {value}", 'yellow'))
-                print(cs("\n Key        | Value      |", 'yellow'))
-                print("+---------------+------------+")
-                for no in data:
-                    for k, d in no.items():
-                        print(f" {k:<10} | {d:<10} |")
-                    print(cs("+---------------+------------+------------+\n", 'yellow'))
+def main():
+    print_banner()
+    
+    parser = argparse.ArgumentParser(description="SimDatabase Tool - Lookup SIM and CNIC details")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-n", "--number", help="Phone number to lookup (e.g., 03XXXXXXXXX or 923XXXXXXXXX)")
+    group.add_argument("-c", "--cnic", help="CNIC to lookup (e.g., 12345-1234567-1 or 1234512345671)")
+    
+    args = parser.parse_args()
+
+    if args.number:
+        if is_number_valid(args.number):
+            print(cs(f"[*] Searching for phone number: {args.number}...", "yellow"))
+            result = get_sim_datebase(args.number)
+            display_table(result, args.number)
         else:
-            print(cs("Invalid option:", option), 'red')
+            print(cs(f"[!] '{args.number}' is not a valid phone number format.", "red"))
+            sys.exit(1)
+
+    elif args.cnic:
+        if validate_cnic(args.cnic):
+            print(cs(f"[*] Searching for CNIC: {args.cnic}...", "yellow"))
+            result = get_cnic_details(args.cnic)
+            display_table(result, args.cnic)
+        else:
+            print(cs(f"[!] '{args.cnic}' is not a valid CNIC format.", "red"))
+            sys.exit(1)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print(cs("\n[!] Operation cancelled by user.", "red"))
+        sys.exit(0)
+    except Exception as e:
+        print(cs(f"\n[!] An unexpected error occurred: {e}", "red"))
+        sys.exit(1)
