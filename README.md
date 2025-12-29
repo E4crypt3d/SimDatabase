@@ -81,7 +81,3 @@ This project is intended for educational purposes only. The code and information
 The authors and contributors of this project cannot be held responsible for any misuse or damage caused by the use of this code. Use it at your own risk and discretion.
 
 Always exercise caution and follow best practices when working with sensitive information or deploying code in a production environment.
-
-## Contact
-
-If you have any questions or suggestions, please feel free to reach out to the creator, E4CRYPT3D, via email at [gohramgkb@gmail.com](mailto:gohramgkb@gmail.com).
