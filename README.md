@@ -98,5 +98,3 @@ If you encounter connection timeouts or issues reaching the database:
 > This tool is provided for educational purposes and for verifying personal information. Any misuse of this tool for illegal activities or unauthorized data access is strictly prohibited. The developers are not responsible for how this tool is used. By using this software, you agree to comply with all local and international privacy laws. Information retrieved is sourced from public endpoints and may not always be up-to-date or accurate.
 
 ---
-
-<p align="center">Made with ❤️ for the Developer Community</p>
