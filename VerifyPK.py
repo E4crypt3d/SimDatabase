@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 from stringcolor import cs
 from requests.exceptions import RequestException
-from utils import get_headers, get_db
+from utils import get_headers, get_db, analyze_cnic
 
 
 class VerifyPK:
@@ -84,6 +84,23 @@ class VerifyPK:
         print(cs(f"No Records Found for {self.value}\n", 'red'))
         return []
 
+    def extract_and_analyze_cnic(self, data: Dict[str, str]) -> Optional[Dict]:
+        """Extract CNIC from data and analyze it"""
+        cnic = data.get("CNIC")
+        if not cnic:
+            return None
+        
+        # Normalize CNIC if needed (remove spaces, ensure proper format)
+        cnic = re.sub(r'\s+', '', cnic)
+        
+        # Check if CNIC has proper format
+        if len(cnic) == 13 and cnic.isdigit():
+            # Format as XXXXX-XXXXXXX-X
+            cnic = f"{cnic[:5]}-{cnic[5:12]}-{cnic[12]}"
+        
+        # Analyze the CNIC
+        return analyze_cnic(cnic)
+
     def run(self):
         print(cs("\nVerifyPK - Sim Database Tool\n", "yellow").bold())
         try:
@@ -95,21 +112,72 @@ class VerifyPK:
                     data = self.process_response(response)
                     if data:
                         print(cs(f"\nData Found for {self.value}:", 'yellow'))
+                        
+                        # Extract and analyze CNIC if available
+                        cnic_analysis = self.extract_and_analyze_cnic(data)
+                        if cnic_analysis and "error" not in cnic_analysis:
+                            self.print_cnic_analysis(cnic_analysis)
+                            print()  # Empty line for separation
+                        
                         self.print_data(data)
             elif self.option == "-c":
                 if not self.validate_cnic():
                     return
+                
+                # Get CNIC analysis for the input CNIC
+                cnic_analysis = analyze_cnic(self.value)
+                
                 response = self._make_request()
                 if response:
                     data = self.process_cnic_response(response)
                     if data:
                         print(cs(f"\nTotal {len(data)} record(s) found for {self.value}:", 'yellow'))
+                        
+                        # Display CNIC analysis for the input CNIC
+                        self.print_cnic_analysis(cnic_analysis)
+                        print()  # Empty line for separation
+                        
+                        # Then display database records
                         for record in data:
                             self.print_data(record)
             else:
                 print(cs("Invalid option specified.", 'red'))
         except Exception as e:
             print(cs(f"An error occurred: {e}\n", 'red'))
+
+    def print_cnic_analysis(self, analysis: dict):
+        """Print CNIC analysis in a formatted table"""
+        if "error" in analysis:
+            print(cs(f"CNIC Analysis Error: {analysis['error']}", 'red'))
+            return
+        
+        print(cs("CNIC DETAILED ANALYSIS:", 'yellow').bold())
+        
+        # Prepare data for table display
+        table_data = {
+            "Input CNIC": analysis.get("Input CNIC", "N/A"),
+            "Normalized CNIC": analysis.get("Normalized CNIC", "N/A"),
+            "Province / Territory": analysis.get("Province / Territory", "N/A"),
+            "Division": analysis.get("Division", "N/A"),
+            "Family Number": analysis.get("Family Number", "N/A"),
+            "Gender": analysis.get("Gender", "N/A")
+        }
+        
+        max_key_len = max(len(k) for k in table_data.keys())
+        max_val_len = max(len(str(v)) for v in table_data.values())
+        
+        border = "+" + "-" * (max_key_len + 2) + "+" + "-" * (max_val_len + 2) + "+"
+        
+        print(cs(border, 'cyan'))
+        
+        for k, v in table_data.items():
+            key_color = 'green' if k in ["Input CNIC", "Normalized CNIC"] else \
+                       'cyan' if k in ["Province / Territory", "Division"] else \
+                       'blue' if k == "Family Number" else 'magenta'
+            
+            print(f"| {cs(k, key_color):<{max_key_len}} | {cs(str(v), 'white'):<{max_val_len}} |")
+        
+        print(cs(border, 'cyan'))
 
     @staticmethod
     def print_data(data: Dict[str, str]):
@@ -122,14 +190,14 @@ class VerifyPK:
         border = "+" + "-" * (max_key_len + 2) + "+" + "-" * (max_val_len + 2) + "+"
         header = f"| {'Key':<{max_key_len}} | {'Value':<{max_val_len}} |"
         
-        print(cs(border, 'cyan'))
-        print(cs(header, 'cyan'))
-        print(cs(border, 'cyan'))
+        print(cs(border, 'green'))
+        print(cs(header, 'green'))
+        print(cs(border, 'green'))
         
         for k, v in data.items():
             print(f"| {k:<{max_key_len}} | {v:<{max_val_len}} |")
         
-        print(cs(border, 'cyan'))
+        print(cs(border, 'green'))
         print("")
 
 
