@@ -67,21 +67,6 @@ python VerifyPK.py -n 03XXXXXXXXX
 python VerifyPK.py -c XXXXX-XXXXXXX-X
 ```
 
-### ⚙️ Example Output
-For CNIC verification:
-```text
-VerifyPK - Sim Database Tool
-
-CNIC DETAILED ANALYSIS:
-+----------------------+----------------------+
-| Input CNIC           | 42101-XXXXXXX-1      |
-| Normalized CNIC      | 42101XXXXXXX1        |
-| Province / Territory | Sindh                |
-| Division             | Karachi              |
-| Family Number        | XXXXXX               |
-| Gender               | Male                 |
-+----------------------+----------------------+
-```
 
 ---
 
