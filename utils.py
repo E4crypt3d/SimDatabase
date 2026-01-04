@@ -4,7 +4,9 @@ import base64
 
 
 def get_db():
-    encoded = "aHR0cHM6Ly9wYWtzaW0uaW5mby9zaW0tZGF0YWJhc2Utb25saW5lLTIwMjItcmVzdWx0LnBocA=="
+    encoded = (
+        "aHR0cHM6Ly9wYWtzaW0uaW5mby9zaW0tZGF0YWJhc2Utb25saW5lLTIwMjItcmVzdWx0LnBocA=="
+    )
 
     decoded = base64.b64decode(encoded).decode()
     return decoded
@@ -29,15 +31,17 @@ def get_headers():
     ori_de = base64.b64decode(ori_en).decode()
 
     headers = {
-        'User-Agent': user_agent,
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': ref_de,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'Origin': ori_de,
-        'Cache-Control': 'max-age=0'
+        "User-Agent": user_agent,
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": ref_de,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Origin": ori_de,
+        "Cache-Control": "max-age=0",
     }
 
     return headers
+
+
 import re
 
 PROVINCES = {
@@ -52,7 +56,6 @@ PROVINCES = {
 }
 
 DIVISIONS = {
-    # Khyber Pakhtunkhwa
     "11": "Bannu Division",
     "12": "Dera Ismail Khan Division",
     "13": "Hazara Division",
@@ -60,8 +63,6 @@ DIVISIONS = {
     "15": "Malakand Division",
     "16": "Mardan Division",
     "17": "Peshawar Division",
-
-    # Punjab
     "31": "Bahawalpur Division",
     "32": "Dera Ghazi Khan Division",
     "33": "Faisalabad Division",
@@ -70,40 +71,25 @@ DIVISIONS = {
     "36": "Multan / Sahiwal Division",
     "37": "Rawalpindi Division",
     "38": "Sargodha / Mianwali Division",
-
-    # Sindh
     "41": "Hyderabad Division",
     "42": "Karachi Division",
     "43": "Larkana Division",
     "44": "Mirpur Khas Division",
     "45": "Sukkur / Shaheed Benazirabad Division",
-
-    # Balochistan
     "51": "Kalat / Rakhshan Division",
     "52": "Makran Division",
     "53": "Nasirabad Division",
     "54": "Quetta Division",
     "55": "Sibi Division",
     "56": "Zhob / Loralai Division",
-
-    # Islamabad
     "61": "Islamabad Capital Territory",
-
-    # Gilgit-Baltistan
     "71": "Gilgit-Baltistan (All Divisions)",
-
-    # Azad Kashmir
     "81": "Mirpur Division",
     "82": "Poonch / Muzaffarabad Division",
 }
 
 
 def normalize_cnic(cnic: str) -> str | None:
-    """
-    Normalize CNIC to XXXXX-XXXXXXX-X format.
-    Accepts input with or without hyphens.
-    """
-
     digits = re.sub(r"\D", "", cnic)
 
     if len(digits) != 13:
