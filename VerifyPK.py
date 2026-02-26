@@ -6,9 +6,8 @@ import requests
 import json
 import os
 from bs4 import BeautifulSoup
-from stringcolor import cs
 from requests.exceptions import RequestException
-from utils import get_headers, get_db, analyze_cnic
+from utils import get_headers, get_db, analyze_cnic, cs, bold
 
 
 class VerifyPK:
@@ -147,7 +146,7 @@ class VerifyPK:
         return analyze_cnic(cnic)
 
     def run(self):
-        print(cs("\nVerifyPK - Sim Database Tool\n", "yellow").bold())
+        print(bold(cs("\nVerifyPK - Sim Database Tool\n", "yellow")))
         try:
             cache_key = self._get_cache_key(self.value)
 
@@ -235,62 +234,25 @@ class VerifyPK:
             print(cs(f"CNIC Analysis Error: {analysis['error']}", "red"))
             return
 
-        print(cs("CNIC DETAILED ANALYSIS:", "yellow").bold())
+        print(bold(cs("CNIC DETAILED ANALYSIS:", "yellow")))
+        print()
 
-        table_data = {
-            "Input CNIC": analysis.get("Input CNIC", "N/A"),
-            "Normalized CNIC": analysis.get("Normalized CNIC", "N/A"),
-            "Province / Territory": analysis.get("Province / Territory", "N/A"),
-            "Division": analysis.get("Division", "N/A"),
-            "Family Number": analysis.get("Family Number", "N/A"),
-            "Gender": analysis.get("Gender", "N/A"),
-        }
-
-        max_key_len = max(len(k) for k in table_data.keys())
-        max_val_len = max(len(str(v)) for v in table_data.values())
-
-        border = "+" + "-" * (max_key_len + 2) + "+" + "-" * (max_val_len + 2) + "+"
-
-        print(cs(border, "cyan"))
-
-        for k, v in table_data.items():
+        for key, value in analysis.items():
             key_color = (
                 "green"
-                if k in ["Input CNIC", "Normalized CNIC"]
-                else (
-                    "cyan"
-                    if k in ["Province / Territory", "Division"]
-                    else "blue" if k == "Family Number" else "magenta"
-                )
+                if key in ["Input CNIC", "Normalized CNIC"]
+                else ("cyan" if key in ["Province / Territory", "Division"] else "blue")
             )
-
-            print(
-                f"| {cs(k, key_color):<{max_key_len}} | {cs(str(v), 'white'):<{max_val_len}} |"
-            )
-
-        print(cs(border, "cyan"))
+            print(f"{cs(key, key_color)}: {cs(str(value), 'white')}")
 
     @staticmethod
     def print_data(data: Dict[str, str]):
         if not data:
             return
 
-        max_key_len = max(len(k) for k in data.keys())
-        # Use str(v) in case there are non-string values
-        max_val_len = max(len(str(v)) for v in data.values())
-
-        border = "+" + "-" * (max_key_len + 2) + "+" + "-" * (max_val_len + 2) + "+"
-        header = f"| {'Key':<{max_key_len}} | {'Value':<{max_val_len}} |"
-
-        print(cs(border, "green"))
-        print(cs(header, "green"))
-        print(cs(border, "green"))
-
         for k, v in data.items():
-            print(f"| {k:<{max_key_len}} | {str(v):<{max_val_len}} |")
-
-        print(cs(border, "green"))
-        print("")
+            print(f"{cs(k, 'green')}: {cs(str(v), 'white')}")
+        print()
 
 
 def main():

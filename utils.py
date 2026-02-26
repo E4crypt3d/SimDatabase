@@ -42,6 +42,62 @@ def get_headers():
     return headers
 
 
+# ANSI Color Codes for terminal output
+class Colors:
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    # Standard colors
+    BLACK = "\033[30m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    WHITE = "\033[37m"
+
+    # Bright colors
+    BRIGHT_BLACK = "\033[90m"
+    BRIGHT_RED = "\033[91m"
+    BRIGHT_GREEN = "\033[92m"
+    BRIGHT_YELLOW = "\033[93m"
+    BRIGHT_BLUE = "\033[94m"
+    BRIGHT_MAGENTA = "\033[95m"
+    BRIGHT_CYAN = "\033[96m"
+    BRIGHT_WHITE = "\033[97m"
+
+
+COLOR_MAP = {
+    "black": Colors.BLACK,
+    "red": Colors.RED,
+    "green": Colors.GREEN,
+    "yellow": Colors.YELLOW,
+    "blue": Colors.BLUE,
+    "magenta": Colors.MAGENTA,
+    "cyan": Colors.CYAN,
+    "white": Colors.WHITE,
+    "bright_black": Colors.BRIGHT_BLACK,
+    "bright_red": Colors.BRIGHT_RED,
+    "bright_green": Colors.BRIGHT_GREEN,
+    "bright_yellow": Colors.BRIGHT_YELLOW,
+    "bright_blue": Colors.BRIGHT_BLUE,
+    "bright_magenta": Colors.BRIGHT_MAGENTA,
+    "bright_cyan": Colors.BRIGHT_CYAN,
+    "bright_white": Colors.BRIGHT_WHITE,
+}
+
+
+def cs(text: str, color: str = "white") -> str:
+    """Colorize text with the specified color."""
+    color_code = COLOR_MAP.get(color.lower(), Colors.WHITE)
+    return f"{color_code}{text}{Colors.RESET}"
+
+
+def bold(text: str) -> str:
+    """Make text bold."""
+    return f"{Colors.BOLD}{text}{Colors.RESET}"
+
+
 import re
 
 PROVINCES = {
