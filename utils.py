@@ -190,12 +190,54 @@ def bold(text: str) -> str:
 # CNIC analysis
 PROVINCES = {
     "1": "Khyber Pakhtunkhwa",
+    "2": "FATA",
     "3": "Punjab",
     "4": "Sindh",
     "5": "Balochistan",
     "6": "Islamabad",
+    "7": "Gilgit-Baltistan",
+    "8": "Azad Kashmir",
 }
-DIVISIONS = {"35": "Lahore", "41": "Hyderabad", "42": "Karachi", "37": "Rawalpindi"}
+
+DIVISIONS = {
+    # Khyber Pakhtunkhwa
+    "11": "Bannu Division",
+    "12": "Dera Ismail Khan Division",
+    "13": "Hazara Division",
+    "14": "Kohat Division",
+    "15": "Malakand Division",
+    "16": "Mardan Division",
+    "17": "Peshawar Division",
+    # Punjab
+    "31": "Bahawalpur Division",
+    "32": "Dera Ghazi Khan Division",
+    "33": "Faisalabad Division",
+    "34": "Gujranwala Division",
+    "35": "Lahore Division",
+    "36": "Multan Division",
+    "37": "Rawalpindi Division",
+    "38": "Sargodha Division",
+    # Sindh
+    "41": "Hyderabad Division",
+    "42": "Karachi Division",
+    "43": "Larkana Division",
+    "44": "Mirpur Khas Division",
+    "45": "Sukkur Division",
+    # Balochistan
+    "51": "Kalat Division",
+    "52": "Makran Division",
+    "53": "Nasirabad Division",
+    "54": "Quetta Division",
+    "55": "Sibi Division",
+    "56": "Zhob Division",
+    # Islamabad
+    "61": "Islamabad Division",
+    # Gilgit-Baltistan
+    "71": "Gilgit Division",
+    # Azad Kashmir
+    "81": "Mirpur Division",
+    "82": "Poonch Division",
+}
 
 
 def normalize_cnic(cnic: str) -> str | None:
@@ -208,10 +250,14 @@ def analyze_cnic(cnic: str) -> dict:
     if not normalized:
         return {"error": "Invalid CNIC format"}
     area_code, family_code, gender_digit = normalized.split("-")
+    gender = "Male" if int(gender_digit) % 2 != 0 else "Female"
+    if int(gender_digit) == 0:
+        gender = "Female"
     return {
         "Input CNIC": cnic,
         "Normalized CNIC": normalized,
         "Province / Territory": PROVINCES.get(area_code[0], "Unknown"),
         "Division": DIVISIONS.get(area_code[:2], "Unknown"),
-        "Gender": "Male" if int(gender_digit) % 2 != 0 else "Female",
+        "Family Code": family_code,
+        "Gender": gender,
     }
