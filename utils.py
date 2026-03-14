@@ -3,6 +3,12 @@ import base64
 import re
 import hashlib
 import hmac
+import os
+import sys
+
+if os.name == "nt":
+    kernel32 = __import__("ctypes").windll.kernel32
+    kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
 
 
 # Obfuscation Helpers

@@ -24,7 +24,7 @@ class VerifyPK:
         self.session = requests.Session()
         print(
             cs(
-                "⚠️  Use only for authorized lookups. Compliance with PECA Act is user responsibility.\n",
+                "⚠️  For educational purposes only. Use at your own risk.\n",
                 "yellow",
             )
         )
@@ -96,22 +96,14 @@ class VerifyPK:
         db = get_db()
         headers = get_headers("primary")
         self._random_delay(0.3, 1.0)
-        for attempt in range(3):
-            try:
-                response = self.session.post(
-                    db, data={"cnnum": self.value}, headers=headers, timeout=10
-                )
-                response.raise_for_status()
-                return response
-            except RequestException as e:
-                print(
-                    cs(
-                        f"Primary source attempt {attempt+1}: {e}. Retrying...\n",
-                        "yellow",
-                    )
-                )
-                time.sleep(1 + attempt)
-        return None
+        try:
+            response = self.session.post(
+                db, data={"cnnum": self.value}, headers=headers, timeout=10
+            )
+            response.raise_for_status()
+            return response
+        except RequestException:
+            return None
 
     def _make_simowners_request(self, mobile: str) -> Optional[requests.Response]:
         url = get_alt_source_a_endpoint()
@@ -123,8 +115,8 @@ class VerifyPK:
             response = self.session.post(url, data=payload, headers=headers, timeout=15)
             response.raise_for_status()
             return response
-        except RequestException as e:
-            print(cs(f"Alternative source #1 request failed: {e}\n", "yellow"))
+        except RequestException:
+            print(cs("⚠️ Source unavailable. Trying next...\n", "yellow"))
             return None
 
     def _make_freshsims_request(self, mobile: str) -> Optional[requests.Response]:
@@ -138,8 +130,8 @@ class VerifyPK:
             )
             response.raise_for_status()
             return response
-        except RequestException as e:
-            print(cs(f"Alternative source #2 request failed: {e}\n", "yellow"))
+        except RequestException:
+            print(cs("⚠️ Source unavailable.\n", "yellow"))
             return None
 
     def _parse_simowners_json(self, json_data: dict) -> List[Dict[str, str]]:
@@ -226,32 +218,36 @@ class VerifyPK:
             response = self.session.post(url, data=data, headers=headers, timeout=15)
             response.raise_for_status()
             return response
-        except RequestException as e:
-            print(cs(f"HTML form request failed: {e}\n", "yellow"))
+        except RequestException:
+            print(cs("⚠️ HTML form source unavailable.\n", "yellow"))
             return None
 
-    def _fetch_from_simowners(self, number: str) -> Dict[str, str]:
+    def _fetch_from_simowners(self, number: str):
+        """Returns (data, network_failed)"""
         response = self._make_simowners_request(number)
+        if response is None:
+            return None, True  # Network failed
         if response:
             try:
                 json_resp = response.json()
                 records = self._parse_simowners_json(json_resp)
-                return records[0] if records else {}
+                return records[0] if records else {}, False
             except json.JSONDecodeError:
-                print(cs("Failed to parse JSON from alternative source #1\n", "red"))
-        return {}
+                print(cs("⚠️ Invalid response from source\n", "red"))
+        return {}, False
 
-    def _fetch_from_alt_source_b(self, number: str) -> Dict[str, str]:
+    def _fetch_from_alt_source_b(self, number: str):
+        """Returns (data, network_failed)"""
         response = self._make_freshsims_request(number)
+        if response is None:
+            return None, True  # Network failed
         if response:
             try:
                 data = self._parse_alt_source_b_html(response.text)
-                return data[0] if data else {}
-            except Exception as e:
-                print(
-                    cs(f"Failed to parse alternative source #2 response: {e}\n", "red")
-                )
-        return {}
+                return data[0] if data else {}, False
+            except Exception:
+                print(cs("⚠️ Invalid response from source\n", "red"))
+        return {}, False
 
     def process_response(self, response: requests.Response) -> Dict[str, str]:
         soup = BeautifulSoup(response.content, "html.parser")
@@ -347,24 +343,31 @@ class VerifyPK:
                     elif self.value.startswith("92"):
                         formats.append("0" + self.value[2:])
 
+                    original_value = self.value
                     data = {}
+                    any_source_contacted = False
                     for fmt in formats:
                         self.value = fmt
 
                         print(cs(f"→ Querying primary source for {fmt}...", "blue"))
                         response = self._make_request()
                         if response:
+                            any_source_contacted = True
                             data = self.process_response(response)
                             if data:
                                 print(
                                     cs("✓ Data retrieved from primary source", "green")
                                 )
                                 break
+                        else:
+                            print(cs("⚠️ Primary source unavailable.\n", "yellow"))
 
                         print(
                             cs(f"→ Trying alternative source #1 for {fmt}...", "yellow")
                         )
-                        data = self._fetch_from_simowners(fmt)
+                        data, failed = self._fetch_from_simowners(fmt)
+                        if not failed:
+                            any_source_contacted = True
                         if data:
                             print(
                                 cs(
@@ -377,7 +380,9 @@ class VerifyPK:
                         print(
                             cs(f"→ Trying alternative source #2 for {fmt}...", "yellow")
                         )
-                        data = self._fetch_from_alt_source_b(fmt)
+                        data, failed = self._fetch_from_alt_source_b(fmt)
+                        if not failed:
+                            any_source_contacted = True
                         if data:
                             print(
                                 cs(
@@ -386,8 +391,6 @@ class VerifyPK:
                                 )
                             )
                             break
-
-                        time.sleep(1)
 
                     if data:
                         self.cache[cache_key] = data
@@ -401,7 +404,15 @@ class VerifyPK:
                         print()
                     self.print_data(data)
                 else:
-                    print(cs(f"\n✗ No records found for {self.value}", "red"))
+                    if not any_source_contacted:
+                        print(
+                            cs(
+                                f"\n✗ Could not connect to any source. Try using a VPN if you're in a restricted region.",
+                                "red",
+                            )
+                        )
+                    else:
+                        print(cs(f"\n✗ No records found for {original_value}", "red"))
 
             elif self.option == "-c":
                 if not self.validate_cnic():
@@ -412,9 +423,13 @@ class VerifyPK:
                     data = self.cache[cache_key]
                 else:
                     data = None
+                    any_source_contacted = False
                     response = self._make_request()
                     if response:
+                        any_source_contacted = True
                         data = self.process_cnic_response(response)
+                    else:
+                        print(cs("⚠️ Primary source unavailable.\n", "yellow"))
                     if not data:
                         print(
                             cs(
@@ -424,6 +439,7 @@ class VerifyPK:
                         )
                         sim_resp = self._make_simowners_request(self.value)
                         if sim_resp:
+                            any_source_contacted = True
                             try:
                                 json_resp = sim_resp.json()
                                 data = self._parse_simowners_json(json_resp)
@@ -440,6 +456,7 @@ class VerifyPK:
                             )
                             html_resp = self._make_html_form_request(self.value, "cnic")
                             if html_resp:
+                                any_source_contacted = True
                                 try:
                                     data = self._parse_html_form_response(
                                         html_resp.text
@@ -457,6 +474,7 @@ class VerifyPK:
                         )
                         alt2_resp = self._make_freshsims_request(self.value)
                         if alt2_resp:
+                            any_source_contacted = True
                             try:
                                 parsed = self._parse_alt_source_b_html(alt2_resp.text)
                                 if parsed:
@@ -466,8 +484,6 @@ class VerifyPK:
                     if data:
                         self.cache[cache_key] = data
                         self._save_cache()
-                    else:
-                        data = []
 
                 if data:
                     print(
@@ -482,14 +498,28 @@ class VerifyPK:
                         print(cs(f"--- Record #{i} ---", "bright_cyan"))
                         self.print_data(record)
                 else:
-                    print(cs(f"\n✗ No records found for CNIC {self.value}", "red"))
+                    if not any_source_contacted:
+                        print(
+                            cs(
+                                "\n✗ Could not connect to any source. Try using a VPN if you're in a restricted region.",
+                                "red",
+                            )
+                        )
+                    else:
+                        print(cs(f"\n✗ No records found for CNIC {self.value}", "red"))
             else:
                 print(cs("Invalid option. Use -n <phone> or -c <cnic>", "red"))
 
         except KeyboardInterrupt:
             print(cs("\n\nOperation cancelled by user.", "yellow"))
-        except Exception as e:
-            print(cs(f"\n✗ Error: {e}\n", "red"))
+        except Exception:
+            print(
+                cs(
+                    "\n✗ An error occurred. Please try again or check your connection.",
+                    "red",
+                )
+            )
+            print(cs("💡 Tip: If the issue persists, try using a VPN.\n", "cyan"))
 
 
 def main():
