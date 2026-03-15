@@ -106,9 +106,27 @@ class VerifyPK:
             return None
 
     def _make_simowners_request(self, mobile: str) -> Optional[requests.Response]:
+        import re
+
+        base_url = get_alt_source_a_base_url()
         url = get_alt_source_a_endpoint()
         track_num = self._normalize_mobile(mobile)
-        payload = {"action": "fetch_simdata", "nonce": "3273a52bbf", "track": track_num}
+
+        # Get fresh nonce from page
+        nonce = "3273a52bbf"
+        try:
+            main_page = self.session.get(base_url, timeout=15)
+            nonce_match = re.search(r'nonce["\']?\s*:\s*["\'](\w+)', main_page.text)
+            if nonce_match:
+                nonce = nonce_match.group(1)
+            else:
+                nonce_match = re.search(r'"nonce"\s*:\s*"([^"]+)"', main_page.text)
+                if nonce_match:
+                    nonce = nonce_match.group(1)
+        except Exception:
+            pass
+
+        payload = {"action": "fetch_simdata", "nonce": nonce, "track": track_num}
         headers = get_headers("alt_source_a")
         self._random_delay(0.5, 1.5)
         try:
@@ -349,48 +367,32 @@ class VerifyPK:
                     for fmt in formats:
                         self.value = fmt
 
-                        print(cs(f"→ Querying primary source for {fmt}...", "blue"))
+                        print(cs(f"→ Trying source #1 for {fmt}...", "blue"))
+                        data, failed = self._fetch_from_alt_source_b(fmt)
+                        if not failed:
+                            any_source_contacted = True
+                        if data:
+                            print(cs("✓ Data retrieved from source #1", "green"))
+                            break
+
+                        print(cs(f"→ Trying source #2 for {fmt}...", "yellow"))
+                        data, failed = self._fetch_from_simowners(fmt)
+                        if not failed:
+                            any_source_contacted = True
+                        if data:
+                            print(cs("✓ Data retrieved from source #2", "green"))
+                            break
+
+                        print(cs(f"→ Trying source #3 for {fmt}...", "yellow"))
                         response = self._make_request()
                         if response:
                             any_source_contacted = True
                             data = self.process_response(response)
                             if data:
-                                print(
-                                    cs("✓ Data retrieved from primary source", "green")
-                                )
+                                print(cs("✓ Data retrieved from source #3", "green"))
                                 break
                         else:
-                            print(cs("⚠️ Primary source unavailable.\n", "yellow"))
-
-                        print(
-                            cs(f"→ Trying alternative source #1 for {fmt}...", "yellow")
-                        )
-                        data, failed = self._fetch_from_simowners(fmt)
-                        if not failed:
-                            any_source_contacted = True
-                        if data:
-                            print(
-                                cs(
-                                    "✓ Data retrieved from alternative source #1",
-                                    "green",
-                                )
-                            )
-                            break
-
-                        print(
-                            cs(f"→ Trying alternative source #2 for {fmt}...", "yellow")
-                        )
-                        data, failed = self._fetch_from_alt_source_b(fmt)
-                        if not failed:
-                            any_source_contacted = True
-                        if data:
-                            print(
-                                cs(
-                                    "✓ Data retrieved from alternative source #2",
-                                    "green",
-                                )
-                            )
-                            break
+                            print(cs("⚠️ Source #3 unavailable.\n", "yellow"))
 
                     if data:
                         self.cache[cache_key] = data
